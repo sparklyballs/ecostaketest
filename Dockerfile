@@ -1,4 +1,4 @@
-FROM python:3.9 AS eco_build
+FROM python:3.9 AS ecostake_build
 
 # build arguments
 ARG DEBIAN_FRONTEND=noninteractive 
@@ -16,15 +16,15 @@ RUN \
 		sudo
 
 # set workdir
-WORKDIR /eco-blockchain
+WORKDIR /ecostake-blockchain
 
 # fetch source
 RUN \
 	if [ -z ${RELEASE+x} ]; then \
-	RELEASE=$(curl -u "${SECRETUSER}:${SECRETPASS}" -sX GET "https://api.github.com/repos/eco-Network/eco-blockchain/releases/latest" \
+	RELEASE=$(curl -u "${SECRETUSER}:${SECRETPASS}" -sX GET "https://api.github.com/repos/Ecostake-Network/ecostake-blockchain/releases/latest" \
 	| jq -r ".tag_name"); \
 	fi \
-	&& git clone --branch ${RELEASE} --recurse-submodules=mozilla-ca https://github.com/eco-Network/eco-blockchain.git . \
+	&& git clone --branch ${RELEASE} --recurse-submodules=mozilla-ca https://github.com/Ecostake-Network/ecostake-blockchain.git . \
 	&& /bin/sh ./install.sh
 
 FROM python:3.9-slim
@@ -34,7 +34,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # environment variables
 ENV \
-        ECO_ROOT=/root/.eco/mainnet \
+        ECOSTAKE_ROOT=/root/.ecostake/mainnet \
         farmer_address= \
         farmer_port= \
         keys="generate" \
@@ -54,7 +54,7 @@ ENV \
 	harvester="false"
 
 # set workdir
-WORKDIR /eco-blockchain
+WORKDIR /ecostake-blockchain
 
 # install dependencies
 RUN \
@@ -78,10 +78,10 @@ RUN \
 
 # set additional runtime environment variables
 ENV \
-	PATH=/eco-blockchain/venv/bin:$PATH
+	PATH=/ecostake-blockchain/venv/bin:$PATH
 
 # copy build files
-COPY --from=eco_build /eco-blockchain /eco-blockchain
+COPY --from=ecostake_build /ecostake-blockchain /ecostake-blockchain
 
 # copy local files
 COPY docker-*.sh /usr/local/bin/
